@@ -1,0 +1,32 @@
+ Project:          The AdaBoosting project.
+ Author:           Fan Min, minfanphd@163.com, minfan@swpu.edu.cn.
+ Copyright:        The source code and all documents are open and free.
+ URL:              https://github.com/FanSmale/FanAdaBoosting
+ Organization:     Lab of machine learning, Southwest Petroleum University, 
+   Chengdu 610500, China. www.fansmale.com.
+ Progress:         Version 1.0.
+ Written time:     July 20, 2020.
+ Last modify time: July 20, 2020.
+
+This is the help document of our training "AdaBoosting with Java implementation".
+
+Here are the explanation of settings.
+
+--Data set information
+Training data: The training data filename (arff file). Please use Browse to
+  select. While selecting a new file, respective settings for our 
+  experimentation will be filled. You can adjust them further.
+Testing data: Can be ignored for "Split in two" and "Use training set" schemes.
+Training/testing scheme: three typical schemes are provided.
+Training fraction: Only valid for the "Split in two" scheme.
+Number of base classifiers: Typically more than 100.
+Stop after converge: When the training accuracy is very close to 1, the training
+  process can be terminated.
+
+--Tracking and output
+Process tracking: Track the process in the console.
+Variable tracking: Track variables for detailed debugging.
+Output to file: Output the results to a file in the "results" folder. Attention: 
+  It is not implemented here yet!
+
+--Repeat times: How many time the experiment repeats.

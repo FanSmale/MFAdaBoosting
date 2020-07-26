@@ -1,0 +1,8 @@
+ Project:          The cost-sensitive rough sets project.
+ Author:           Fan Min, minfanphd@163.com 
+ Copyright:        The source code and all documents are open and free. PLEASE keep this header while revising the program.
+ Organizaion:      Key Lab of Granular Computing, Zhangzhou Normal University, Fujian 363000, China.
+ Progress:         Data models are constructed.
+ Written time:     March 09, 2011.
+ Last modify time: March 02, 2012.
+
