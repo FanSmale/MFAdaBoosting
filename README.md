@@ -1,2 +1,2 @@
 # MFAdaBoosting
- Ada boosting
+ AdaBoosting Java Implementation
