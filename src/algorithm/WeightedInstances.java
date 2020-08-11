@@ -2,7 +2,6 @@ package algorithm;
 
 import java.io.FileReader;
 import java.util.Arrays;
-
 import weka.core.Instances;
 
 /**
@@ -12,8 +11,8 @@ import weka.core.Instances;
  * @author Fan Min<br>
  *         www.fansmale.com, github.com/fansmale/MFAdaBoosting.<br>
  *         Email: minfan@swpu.edu.cn, minfanphd@163.com.<br>
- * Date Created: July 18, 2020.<br>
- *       Last modified: July 19, 2020.
+ *         Date Created: July 18, 2020.<br>
+ *         Last modified: July 19, 2020.
  * @version 1.0
  */
 
@@ -26,18 +25,19 @@ public class WeightedInstances extends Instances {
 	/**
 	 * Weights.
 	 */
-	double[] weights;
+	private double[] weights;
 
 	/**
 	 ****************** 
 	 * The first constructor.
 	 * 
-	 * @param paraInstances
-	 *            The given instance.
+	 * @param paraReader
+	 *            The given reader to read data from file.
 	 ****************** 
 	 */
-	public WeightedInstances(Instances paraInstances) {
-		super(paraInstances);
+	public WeightedInstances(FileReader paraFileReader) throws Exception {
+		super(paraFileReader);
+		setClassIndex(numAttributes() - 1);
 
 		// Initialize weights
 		weights = new double[numInstances()];
@@ -45,7 +45,7 @@ public class WeightedInstances extends Instances {
 		for (int i = 0; i < weights.length; i++) {
 			weights[i] = tempAverage;
 		} // Of for i
-	}// Of the first constructor
+	} // Of the first constructor
 
 	/**
 	 ****************** 
@@ -53,39 +53,19 @@ public class WeightedInstances extends Instances {
 	 * 
 	 * @param paraInstances
 	 *            The given instance.
-	 * @param paraWeights
-	 *            Weights determined by the last classifier.
-	 * @param paraCorrectnessArray
-	 *            The correctness array determined by the last classifier.
-	 * @param paraWeightedError
-	 *            The weighted error determined by the last classifier.
 	 ****************** 
 	 */
-	public WeightedInstances(Instances paraInstances, double[] paraWeights,
-			boolean[] paraCorrectnessArray, double paraWeightedError) {
+	public WeightedInstances(Instances paraInstances) {
 		super(paraInstances);
+		setClassIndex(numAttributes() - 1);
 
-		// The weights are copied one by one.
+		// Initialize weights
 		weights = new double[numInstances()];
+		double tempAverage = 1.0 / numInstances();
 		for (int i = 0; i < weights.length; i++) {
-			weights[i] = paraWeights[i];
+			weights[i] = tempAverage;
 		} // Of for i
-
-		// Adjust weights for new training.
-		adjustWeights(paraCorrectnessArray, paraWeightedError);
-	}// Of the second constructor
-
-	/**
-	 ****************** 
-	 * Setter.
-	 * 
-	 * @param paraWeights
-	 *            The given weights.
-	 ****************** 
-	 */
-	public void setWeights(double[] paraWeights) {
-		weights = paraWeights;
-	}// Of setWeights
+	} // Of the second constructor
 
 	/**
 	 ****************** 
@@ -95,8 +75,14 @@ public class WeightedInstances extends Instances {
 	 ****************** 
 	 */
 	public double[] getWeights() {
-		return weights;
-	}// Of getWeights
+		double[] resultWeights = new double[weights.length];
+
+		for (int i = 0; i < resultWeights.length; i++) {
+			resultWeights[i] = weights[i];
+		} // Of for i
+
+		return resultWeights;
+	} // Of getWeights
 
 	/**
 	 ****************** 
@@ -109,7 +95,7 @@ public class WeightedInstances extends Instances {
 	 */
 	public double getWeight(int paraIndex) {
 		return weights[paraIndex];
-	}// Of getWeight
+	} // Of getWeight
 
 	/**
 	 ****************** 
@@ -117,20 +103,15 @@ public class WeightedInstances extends Instances {
 	 * 
 	 * @param paraCorrectArray
 	 *            Indicate which instances have been correctly classified.
+	 * @param paraAlpha
+	 *            The weight of the last classifier.
 	 ****************** 
 	 */
-	public void adjustWeights(boolean[] paraCorrectArray, 
-			double paraWeightedError) {
-		//Step 1. Avoid overflow.
-		if (paraWeightedError < 1e-6) {
-			paraWeightedError = 1e-6;
-		}//Of if
-		
+	public void adjustWeights(boolean[] paraCorrectArray, double paraAlpha) {
 		// Step 2. Calculate alpha.
-		double tempAlpha = 0.5 * Math.log((1 - paraWeightedError) / paraWeightedError);
-		double tempIncrease = Math.exp(tempAlpha);
-		
-		// Step 3. Adjust.		
+		double tempIncrease = Math.exp(paraAlpha);
+
+		// Step 3. Adjust.
 		double tempWeightsSum = 0; // For normalization.
 		for (int i = 0; i < weights.length; i++) {
 			if (paraCorrectArray[i]) {
@@ -140,12 +121,32 @@ public class WeightedInstances extends Instances {
 			} // Of if
 			tempWeightsSum += weights[i];
 		} // Of for i
-		
+
 		// Step 4. Normalize.
 		for (int i = 0; i < weights.length; i++) {
 			weights[i] /= tempWeightsSum;
 		} // Of for i
-	}// Of adjustWeights
+	} // Of adjustWeights
+
+	/**
+	 ****************** 
+	 * Test the method.
+	 ****************** 
+	 */
+	public void adjustWeightsTest() {
+		boolean[] tempCorrectArray = new boolean[numInstances()];
+		for (int i = 0; i < tempCorrectArray.length / 2; i++) {
+			tempCorrectArray[i] = true;
+		} // Of for i
+
+		double tempWeightedError = 0.3;
+
+		adjustWeights(tempCorrectArray, tempWeightedError);
+
+		System.out.println("After adjusting");
+
+		System.out.println(toString());
+	} // Of adjustWeightsTest
 
 	/**
 	 ****************** 
@@ -153,35 +154,37 @@ public class WeightedInstances extends Instances {
 	 ****************** 
 	 */
 	public String toString() {
-		String resultString = "I am a weighted instances object.\r\n" + "I have "
-				+ numInstances() + " instances and " + (numAttributes() - 1) 
-				+ " conditional attributes.\r\n" + "My weights is: " 
-				+ Arrays.toString(weights) + "\r\n" + "My data is: \r\n"
+		String resultString = "I am a weighted Instances object.\r\n" + "I have " + numInstances()
+				+ " instances and " + (numAttributes() - 1) + " conditional attributes.\r\n"
+				+ "My weights are: " + Arrays.toString(weights) + "\r\n" + "My data are: \r\n"
 				+ super.toString();
 
 		return resultString;
-	}// Of toString
+	} // Of toString
 
 	/**
 	 ****************** 
 	 * For unit test.
-	 * @param args Not provided.
+	 * 
+	 * @param args
+	 *            Not provided.
 	 ****************** 
 	 */
 	public static void main(String args[]) {
-		Instances tempInstances = null;
+		WeightedInstances tempWeightedInstances = null;
 		String tempFilename = "src/data/iris.arff";
 		try {
 			FileReader tempFileReader = new FileReader(tempFilename);
-			tempInstances = new Instances(tempFileReader);
+			tempWeightedInstances = new WeightedInstances(tempFileReader);
 			tempFileReader.close();
-		} catch (Exception ee) {
-			System.out.println("Cannot read the file: " + tempFilename + "\r\n" + ee);
+		} catch (Exception exception1) {
+			System.out.println("Cannot read the file: " + tempFilename + "\r\n" + exception1);
 			System.exit(0);
 		} // Of try
 
-		WeightedInstances tempWeightedInstances = new WeightedInstances(tempInstances);
-		System.out.println(tempWeightedInstances);
-	}// Of main
+		System.out.println(tempWeightedInstances.toString());
 
-}// Of class WeightedInstances
+		tempWeightedInstances.adjustWeightsTest();
+	} // Of main
+
+} // Of class WeightedInstances

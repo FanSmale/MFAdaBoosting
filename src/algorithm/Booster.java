@@ -51,7 +51,7 @@ public class Booster {
 	int numClassifiers;
 
 	/**
-	 * Whether or not stop after converge.
+	 * Whether or not stop after the training error is 0.
 	 */
 	boolean stopAfterConverge = false;
 
@@ -130,7 +130,7 @@ public class Booster {
 
 	/**
 	 ****************** 
-	 * The first constructor.
+	 * The third constructor.
 	 * 
 	 * @param paraFilename
 	 *            The data filename.
@@ -200,39 +200,38 @@ public class Booster {
 	 ****************** 
 	 */
 	public void train() {
-		// Step 1. Build the first classifier.
-		WeightedInstances tempWeightedInstances = new WeightedInstances(trainingData);
-		classifiers[0] = new StumpClassifier(tempWeightedInstances);
-		classifiers[0].train();
-		double tempAccuracy = classifiers[0].computeTrainingAccuracy();
-		double tempError = classifiers[0].computeWeightedError();
-		classifierWeights[0] = 0.5 * Math.log(1 / tempError - 1);
-		numClassifiers = 1;
-		SimpleTools.variableTrackingOutput(
-				"Classifier #" + 0 + " accuray = " + tempAccuracy + ", weighted error = "
-						+ tempError + ", weight = " + classifierWeights[0] + "\r\n");
+		// Step 1. Initialize.
+		WeightedInstances tempWeightedInstances = null;
+		double tempError;
+		numClassifiers = 0;
 
 		// Step 2. Build other classifiers.
-		for (int i = 1; i < classifiers.length; i++) {
-			tempWeightedInstances = new WeightedInstances(trainingData,
-					classifiers[i - 1].getWeights(), classifiers[i - 1].computeCorrectnessArray(),
-					classifiers[i - 1].computeWeightedError());
+		for (int i = 0; i < classifiers.length; i++) {
+			if (i == 0) {
+				tempWeightedInstances = new WeightedInstances(trainingData);
+			} else {
+				// Adjust the weights of the data.
+				tempWeightedInstances.adjustWeights(classifiers[i - 1].computeCorrectnessArray(),
+						classifierWeights[i - 1]);
+			} // Of if
+
+			// Train the next classifier.
 			classifiers[i] = new StumpClassifier(tempWeightedInstances);
 			classifiers[i].train();
-			tempAccuracy = classifiers[i].computeTrainingAccuracy();
+
+			// tempAccuracy = classifiers[i].computeTrainingAccuracy();
 			tempError = classifiers[i].computeWeightedError();
+			// Set the classifier weight.
 			classifierWeights[i] = 0.5 * Math.log(1 / tempError - 1);
 
-			SimpleTools.variableTrackingOutput(
-					"Classifier #" + i + " accuray = " + tempAccuracy + ", weighted error = "
-							+ tempError + ", weight = " + classifierWeights[i] + "\r\n");
+			SimpleTools.variableTrackingOutput("Classifier #" + i + " , weighted error = "
+					+ tempError + ", weight = " + classifierWeights[i] + "\r\n");
 
 			numClassifiers++;
 
 			double tempTrainingAccuracy = computeTrainingAccuray();
 			SimpleTools.variableTrackingOutput(
 					"The accuracy of the booster is: " + tempTrainingAccuracy + "\r\n");
-
 			// The accuracy is enough.
 			if (stopAfterConverge) {
 				if (tempTrainingAccuracy > 0.999999) {
@@ -282,6 +281,7 @@ public class Booster {
 	public double test() {
 		SimpleTools.processTrackingOutput(
 				"Testing on " + testingData.numInstances() + " instances.\r\n");
+
 		return test(testingData);
 	}// Of test
 
@@ -325,17 +325,21 @@ public class Booster {
 
 		for (int i = 0; i < paraInstances.numInstances(); i++) {
 			Instance tempInstance = paraInstances.instance(i);
-			if (classify(tempInstance) == (double) tempInstance.classValue()) {
+			if (classify(tempInstance) == (int) tempInstance.classValue()) {
 				tempCorrect++;
 			} // Of if
 		} // Of for i
 
-		return tempCorrect / paraInstances.numInstances();
-	}// Of test
+		double resultAccuracy = tempCorrect / paraInstances.numInstances();
+		SimpleTools.variableTrackingOutput("The accuracy is: " + resultAccuracy);
+
+		return resultAccuracy;
+	} // Of test
 
 	/**
 	 ****************** 
 	 * Compute the training accuracy of the booster.
+	 * It is not weighted.
 	 * 
 	 * @return The training accuracy.
 	 ****************** 
@@ -364,13 +368,17 @@ public class Booster {
 	 */
 	public static void main(String args[]) {
 		System.out.println("Starting AdaBoosting...");
-		Booster tempBooster = new Booster("src/data/wdbc_norm_ex.arff");
-		// Booster tempBooster = new Booster("src/data/iris.arff", 200);
+		// Booster tempBooster = new Booster("src/data/wdbc_norm_ex.arff");
+		Booster tempBooster = new Booster("src/data/iris.arff", 0.8);
 
-		tempBooster.setNumBaseClassifiers(80);
+		//tempBooster.setStopAfterConverge(true);
+		SimpleTools.processTracking = true;
+		SimpleTools.variableTracking = true;
+		tempBooster.setNumBaseClassifiers(200);
 		tempBooster.train();
 
 		System.out.println("The training accuracy is: " + tempBooster.computeTrainingAccuray());
+		tempBooster.test();
 	}// Of main
 
 }// Of class Booster

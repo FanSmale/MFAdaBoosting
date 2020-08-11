@@ -1,12 +1,8 @@
 package algorithm;
 
 import weka.core.Instance;
-import weka.core.Instances;
-
 import java.io.FileReader;
-import java.util.Arrays;
-
-import common.Common;
+import java.util.*;
 
 /**
  * The stump classifier.<br>
@@ -21,6 +17,11 @@ import common.Common;
  */
 
 public class StumpClassifier{
+	/**
+	 * A random object.
+	 */
+	static Random random = new Random();
+	
 	/**
 	 * Weighted data.
 	 */
@@ -68,7 +69,7 @@ public class StumpClassifier{
 	 */
 	public void train() {
 		//Step 1. Randomly choose an attribute.
-		selectedAttribute = Common.random.nextInt(weightedInstances.numAttributes() - 1);
+		selectedAttribute = random.nextInt(weightedInstances.numAttributes() - 1);
 		
 		//Step 2. Find all attribute values and sort.
 		double[] tempValuesArray = new double[weightedInstances.numInstances()];
@@ -77,10 +78,11 @@ public class StumpClassifier{
 		}//Of for i
 		Arrays.sort(tempValuesArray);
 		
-		//Step 3. Initialize, classify all instances as the same.
+		//Step 3. Initialize, classify all instances as the same with the original cut.
 		int tempNumLabels = weightedInstances.classAttribute().numValues();
 		double[] tempLabelCountArray = new double[tempNumLabels];
 		int tempCurrentLabel;
+		
 		//Step 3.1 Scan all labels to obtain their counts.
 		for (int i = 0; i < weightedInstances.numInstances(); i++) {
 			//The label of the ith instance
@@ -90,7 +92,7 @@ public class StumpClassifier{
 		
 		//Step 3.2 Find the label with the maximal count.
 		double tempMaxCorrect = 0;
-		int tempBestLabel = 0;
+		int tempBestLabel = -1;
 		for (int i = 0; i < tempLabelCountArray.length; i++) {
 			if (tempMaxCorrect < tempLabelCountArray[i]) {
 				tempMaxCorrect = tempLabelCountArray[i];
@@ -104,7 +106,7 @@ public class StumpClassifier{
 		rightLeafLabel = tempBestLabel;
 		
 		//Step 4. Check candidate cuts one by one.
-		//Step 4.1 To handle multi-class data, left and right 
+		//Step 4.1 To handle multi-class data, left and right. 
 		double tempCut;
 		double[][] tempLabelCountMatrix = new double[2][tempNumLabels];
 		
@@ -116,11 +118,13 @@ public class StumpClassifier{
 			tempCut = (tempValuesArray[i] + tempValuesArray[i + 1]) / 2;
 			
 			//Step 4.2 Scan all labels to obtain their counts wrt. the cut.
+			//Initialize again since it is used many times.
 			for (int j = 0; j < 2; j ++) {
 				for (int k = 0; k < tempNumLabels; k ++) {
 					tempLabelCountMatrix[j][k] = 0;
 				}//Of for k
 			}//Of for j
+			
 			for (int j = 0; j < weightedInstances.numInstances(); j++) {
 				//The label of the jth instance
 				tempCurrentLabel = (int)weightedInstances.instance(j).classValue();
@@ -171,13 +175,13 @@ public class StumpClassifier{
 	 ****************** 
 	 */
 	public int classify(Instance paraInstance) {
-		int tempLabel = -1;
+		int resultLabel = -1;
 		if (paraInstance.value(selectedAttribute) < bestCut) {
-			tempLabel = leftLeafLabel;
+			resultLabel = leftLeafLabel;
 		} else {
-			tempLabel = rightLeafLabel;
+			resultLabel = rightLeafLabel;
 		}//Of if
-		return tempLabel;
+		return resultLabel;
 	}//Of classify
 
 	/**
@@ -197,14 +201,14 @@ public class StumpClassifier{
 	 ****************** 
 	 */
 	public boolean[] computeCorrectnessArray() {
-		boolean[] tempCorrectnessArray = new boolean[weightedInstances.numInstances()];
-		for (int i = 0; i < tempCorrectnessArray.length; i++) {
+		boolean[] resultCorrectnessArray = new boolean[weightedInstances.numInstances()];
+		for (int i = 0; i < resultCorrectnessArray.length; i++) {
 			Instance tempInstance = weightedInstances.instance(i);
-			if ((int)tempInstance.classValue() == classify(tempInstance)) {
-				tempCorrectnessArray[i] = true;
+			if ((int)(tempInstance.classValue()) == classify(tempInstance)) {
+				resultCorrectnessArray[i] = true;
 			}//Of if
 		}//Of for i
-		return tempCorrectnessArray;
+		return resultCorrectnessArray;
 	}//Of computeCorrectnessArray
 
 	/**
@@ -222,25 +226,31 @@ public class StumpClassifier{
 			}//Of if
 		}//Of for i
 		
-		return tempCorrect / tempCorrectnessArray.length;
+		double resultAccuracy = tempCorrect / tempCorrectnessArray.length;
+		
+		return resultAccuracy;
 	}//Of computeTrainingAccuracy
 
 	/**
 	 ****************** 
-	 * Compute the weighted error on the training set.
+	 * Compute the weighted error on the training set. It is at least 1e-6 to avoid NaN.
 	 * @return The weighted error.
 	 ****************** 
 	 */
 	public double computeWeightedError() {
-		double tempError = 0;
+		double resultError = 0;
 		boolean[] tempCorrectnessArray = computeCorrectnessArray();
 		for (int i = 0; i < tempCorrectnessArray.length; i++) {
 			if (!tempCorrectnessArray[i]) {
-				tempError += weightedInstances.getWeight(i);
+				resultError += weightedInstances.getWeight(i);
 			}//Of if
 		}//Of for i
 		
-		return tempError;
+		if (resultError < 1e-6) {
+			resultError = 1e-6;
+		}//Of if
+		
+		return resultError;
 	}//Of computeWeightedError
 	
 	/**
@@ -267,19 +277,17 @@ public class StumpClassifier{
 	 ****************** 
 	 */
 	public static void main(String args[]){
-		Instances tempInstances = null;
+		WeightedInstances tempWeightedInstances = null;
 		String tempFilename = "src/data/iris.arff";
 		try {
 			FileReader tempFileReader = new FileReader(tempFilename);
-			tempInstances = new Instances(tempFileReader);
+			tempWeightedInstances = new WeightedInstances(tempFileReader);
 			tempFileReader.close();
 		} catch (Exception ee) {
 			System.out.println("Cannot read the file: " + tempFilename + "\r\n" + ee);
 			System.exit(0);
 		} // Of try
 		
-		tempInstances.setClassIndex(tempInstances.numAttributes() - 1);
-		WeightedInstances tempWeightedInstances = new WeightedInstances(tempInstances);
 		StumpClassifier tempClassifier = new StumpClassifier(tempWeightedInstances);
 		tempClassifier.train();
 		System.out.println(tempClassifier);
