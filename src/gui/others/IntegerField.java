@@ -102,9 +102,9 @@ public class IntegerField extends TextField implements FocusListener {
 			// System.out.println(tempInt);
 		} catch (Exception ee) {
 			ErrorDialog.errorDialog.setMessageAndShow("\"" + getText()
-					+ "\"Not an integer. Please check.");
+					+ "\" is not an integer. Please check.");
 			requestFocus();
-		}
+		}//Of try
 	}// Of focusLost
 
 	/**

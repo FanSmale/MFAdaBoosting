@@ -284,7 +284,7 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 		messageTextArea.append("Runtime: " + tempTimeUsed + "\r\n");
 
 		messageTextArea.append("\r\nEnd.");
-	}// Of actionPerformed
+	} // Of actionPerformed
 
 	/**
 	 *************************** 
@@ -292,7 +292,7 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 	 *************************** 
 	 */
 	public void itemStateChanged(ItemEvent paraEvent) {
-	}// Of itemStateChanged
+	} // Of itemStateChanged
 
 	/**
 	 *************************** 
@@ -322,7 +322,7 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 		} catch (Exception ee) {
 			System.out.println("Error occurred while reading properties: " + ee);
 		} // Of try
-	}// Of textValueChanged
+	} // Of textValueChanged
 
 	/**
 	 *************************** 
@@ -334,5 +334,5 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 	 */
 	public static void main(String args[]) {
 		new MabGUI();
-	}// Of main
-}// Of class MabGUI
+	} // Of main
+} // Of class MabGUI

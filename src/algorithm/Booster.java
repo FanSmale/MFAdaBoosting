@@ -19,7 +19,7 @@ import common.SimpleTools;
  * @version 1.0
  */
 
-public class Booster {
+public class Booster extends Object{
 	/**
 	 * The training testing scheme: split in two.
 	 */
@@ -204,9 +204,11 @@ public class Booster {
 		WeightedInstances tempWeightedInstances = null;
 		double tempError;
 		numClassifiers = 0;
-
+		SimpleTools.processTrackingOutput("Booster.train() Step 1\r\n");
+		
 		// Step 2. Build other classifiers.
 		for (int i = 0; i < classifiers.length; i++) {
+			//Step 2.1 Construct or adjust the weightedInstances
 			if (i == 0) {
 				tempWeightedInstances = new WeightedInstances(trainingData);
 			} else {
@@ -214,15 +216,22 @@ public class Booster {
 				tempWeightedInstances.adjustWeights(classifiers[i - 1].computeCorrectnessArray(),
 						classifierWeights[i - 1]);
 			} // Of if
+			SimpleTools.processTrackingOutput("Booster.train() Step 2.1\r\n");
 
-			// Train the next classifier.
+			// Step 2.2 Train the next classifier.
 			classifiers[i] = new StumpClassifier(tempWeightedInstances);
 			classifiers[i].train();
+			SimpleTools.processTrackingOutput("Booster.train() Step 2.2\r\n");
 
 			// tempAccuracy = classifiers[i].computeTrainingAccuracy();
 			tempError = classifiers[i].computeWeightedError();
 			// Set the classifier weight.
 			classifierWeights[i] = 0.5 * Math.log(1 / tempError - 1);
+			if (classifierWeights[i] < 1e-6) {
+				classifierWeights[i] = 0;
+			}//Of if
+			SimpleTools.variableTrackingOutput("Booster.train(), the " + i + "th classifier has weight "
+					+ classifierWeights[i] + "\r\n");
 
 			SimpleTools.variableTrackingOutput("Classifier #" + i + " , weighted error = "
 					+ tempError + ", weight = " + classifierWeights[i] + "\r\n");
@@ -368,13 +377,15 @@ public class Booster {
 	 */
 	public static void main(String args[]) {
 		System.out.println("Starting AdaBoosting...");
-		// Booster tempBooster = new Booster("src/data/wdbc_norm_ex.arff");
-		Booster tempBooster = new Booster("src/data/iris.arff", 0.8);
+		//Booster tempBooster = new Booster("src/data/wdbc_norm_ex.arff");
+		//Booster tempBooster = new Booster("src/data/iris.arff", 0.8);
+		Booster tempBooster = new Booster("src/data/smalliris.arff", 0.8);
+		//Booster tempBooster = new Booster("src/data/wine.arff", 0.8);
 
-		//tempBooster.setStopAfterConverge(true);
-		SimpleTools.processTracking = true;
+		tempBooster.setStopAfterConverge(true);
+		SimpleTools.processTracking = false;
 		SimpleTools.variableTracking = true;
-		tempBooster.setNumBaseClassifiers(200);
+		tempBooster.setNumBaseClassifiers(20);
 		tempBooster.train();
 
 		System.out.println("The training accuracy is: " + tempBooster.computeTrainingAccuray());

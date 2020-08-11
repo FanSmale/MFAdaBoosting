@@ -2,6 +2,7 @@ package algorithm;
 
 import java.io.FileReader;
 import java.util.Arrays;
+
 import weka.core.Instances;
 
 /**
@@ -71,23 +72,6 @@ public class WeightedInstances extends Instances {
 	 ****************** 
 	 * Getter.
 	 * 
-	 * @return The weights.
-	 ****************** 
-	 */
-	public double[] getWeights() {
-		double[] resultWeights = new double[weights.length];
-
-		for (int i = 0; i < resultWeights.length; i++) {
-			resultWeights[i] = weights[i];
-		} // Of for i
-
-		return resultWeights;
-	} // Of getWeights
-
-	/**
-	 ****************** 
-	 * Getter.
-	 * 
 	 * @param paraIndex
 	 *            The given index.
 	 * @return The weight of the given index.
@@ -126,6 +110,8 @@ public class WeightedInstances extends Instances {
 		for (int i = 0; i < weights.length; i++) {
 			weights[i] /= tempWeightsSum;
 		} // Of for i
+		
+		//SimpleTools.variableTrackingOutput("The current weights are: " + Arrays.toString(weights));
 	} // Of adjustWeights
 
 	/**
