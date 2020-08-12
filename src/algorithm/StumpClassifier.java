@@ -4,6 +4,7 @@ import weka.core.Instance;
 import java.io.FileReader;
 import java.util.*;
 
+import common.Common;
 import common.SimpleTools;
 
 /**
@@ -19,10 +20,6 @@ import common.SimpleTools;
  */
 
 public class StumpClassifier {
-	/**
-	 * A random object.
-	 */
-	static Random random = new Random();
 
 	/**
 	 * Weighted data.
@@ -73,7 +70,7 @@ public class StumpClassifier {
 	 */
 	public void train() {
 		// Step 1. Randomly choose an attribute.
-		selectedAttribute = random.nextInt(weightedInstances.numAttributes() - 1);
+		selectedAttribute = Common.random.nextInt(weightedInstances.numAttributes() - 1);
 
 		// Step 2. Find all attribute values and sort.
 		double[] tempValuesArray = new double[weightedInstances.numInstances()];
@@ -168,7 +165,7 @@ public class StumpClassifier {
 				rightLeafLabel = tempRightBestLabel;
 			} // Of if
 		} // Of for i
-		
+
 		SimpleTools.variableTrackingOutput("Attribute = " + selectedAttribute + ", cut = " + bestCut
 				+ ", leftLeafLabel = " + leftLeafLabel + ", rightLeafLabel = " + rightLeafLabel);
 	}// Of train

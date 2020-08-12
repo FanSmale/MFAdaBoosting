@@ -21,6 +21,7 @@ import common.SimpleTools;
  */
 
 public class Booster extends Object{
+	
 	/**
 	 * The training testing scheme: split in two.
 	 */
@@ -105,9 +106,9 @@ public class Booster extends Object{
 	 * The second constructor.
 	 * 
 	 * @param paraTrainingFilename
-	 *            The data filename.
-	 * @param paraMaxClassifiers
-	 *            The maximal number of classifiers.
+	 *            The training data filename.
+	 * @param paraTestingFilename
+	 *            The testing data filename.
 	 ****************** 
 	 */
 	public Booster(String paraTrainingFilename, String paraTestingFilename) {
@@ -200,6 +201,7 @@ public class Booster extends Object{
 	/**
 	 ****************** 
 	 * Train the booster.
+	 * @see algorithm.StumpClassifier#train()
 	 ****************** 
 	 */
 	public void train() {

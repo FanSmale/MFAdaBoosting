@@ -19,6 +19,7 @@ import weka.core.Instances;
  */
 
 public class WeightedInstances extends Instances {
+
 	/**
 	 * Just the requirement of some classes, any number is ok.
 	 */
@@ -33,7 +34,7 @@ public class WeightedInstances extends Instances {
 	 ****************** 
 	 * The first constructor.
 	 * 
-	 * @param paraReader
+	 * @param paraFileReader
 	 *            The given reader to read data from file.
 	 ****************** 
 	 */
@@ -113,8 +114,9 @@ public class WeightedInstances extends Instances {
 		for (int i = 0; i < weights.length; i++) {
 			weights[i] /= tempWeightsSum;
 		} // Of for i
-		
-		SimpleTools.variableTrackingOutput("After adjusting, instances weights are: " + Arrays.toString(weights));
+
+		SimpleTools.variableTrackingOutput(
+				"After adjusting, instances weights are: " + Arrays.toString(weights));
 	} // Of adjustWeights
 
 	/**

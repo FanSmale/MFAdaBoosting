@@ -95,10 +95,12 @@ public class SimpleTools extends Object {
 
 	/**
 	 ********************************** 
-	 * Console output.
+	 * Split a data set in two.
 	 * 
-	 * @param paraString
-	 *            the given string.
+	 * @param paraOringinalData
+	 *            the given data.
+	 * @param paraFraction
+	 *            The training set fraction.
 	 ********************************** 
 	 */
 	public static Instances[] splitInTwo(Instances paraOringinalData, double paraFraction) {
