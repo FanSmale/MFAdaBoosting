@@ -3,6 +3,7 @@ package algorithm;
 import java.io.FileReader;
 import java.util.Arrays;
 
+import common.SimpleTools;
 import weka.core.Instances;
 
 /**
@@ -46,6 +47,7 @@ public class WeightedInstances extends Instances {
 		for (int i = 0; i < weights.length; i++) {
 			weights[i] = tempAverage;
 		} // Of for i
+		SimpleTools.variableTrackingOutput("Instances weights are: " + Arrays.toString(weights));
 	} // Of the first constructor
 
 	/**
@@ -66,6 +68,7 @@ public class WeightedInstances extends Instances {
 		for (int i = 0; i < weights.length; i++) {
 			weights[i] = tempAverage;
 		} // Of for i
+		SimpleTools.variableTrackingOutput("Instances weights are: " + Arrays.toString(weights));
 	} // Of the second constructor
 
 	/**
@@ -111,7 +114,7 @@ public class WeightedInstances extends Instances {
 			weights[i] /= tempWeightsSum;
 		} // Of for i
 		
-		//SimpleTools.variableTrackingOutput("The current weights are: " + Arrays.toString(weights));
+		SimpleTools.variableTrackingOutput("After adjusting, instances weights are: " + Arrays.toString(weights));
 	} // Of adjustWeights
 
 	/**

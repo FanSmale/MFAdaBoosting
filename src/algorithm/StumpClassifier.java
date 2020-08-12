@@ -4,6 +4,8 @@ import weka.core.Instance;
 import java.io.FileReader;
 import java.util.*;
 
+import common.SimpleTools;
+
 /**
  * The stump classifier.<br>
  * Project: Java implementation of the AdaBoosting algorithm.<br>
@@ -166,6 +168,9 @@ public class StumpClassifier {
 				rightLeafLabel = tempRightBestLabel;
 			} // Of if
 		} // Of for i
+		
+		SimpleTools.variableTrackingOutput("Attribute = " + selectedAttribute + ", cut = " + bestCut
+				+ ", leftLeafLabel = " + leftLeafLabel + ", rightLeafLabel = " + rightLeafLabel);
 	}// Of train
 
 	/**

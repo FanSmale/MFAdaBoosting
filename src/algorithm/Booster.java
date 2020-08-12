@@ -1,6 +1,7 @@
 package algorithm;
 
 import java.io.FileReader;
+import java.util.Arrays;
 
 import weka.core.Instance;
 import weka.core.Instances;
@@ -95,6 +96,8 @@ public class Booster extends Object{
 		// Step 5. The testing data is the same as the training data.
 		testingData = trainingData;
 		trainingTestingScheme = USE_TRAINING_SET;
+		
+		SimpleTools.variableTrackingOutput("****************Data**********\r\n" + trainingData);
 	}// Of the first constructor
 
 	/**
@@ -204,6 +207,7 @@ public class Booster extends Object{
 		WeightedInstances tempWeightedInstances = null;
 		double tempError;
 		numClassifiers = 0;
+		System.out.println("****************** Booster.train() ******************\r\n");
 		SimpleTools.processTrackingOutput("Booster.train() Step 1\r\n");
 		
 		// Step 2. Build other classifiers.
@@ -230,8 +234,7 @@ public class Booster extends Object{
 			if (classifierWeights[i] < 1e-6) {
 				classifierWeights[i] = 0;
 			}//Of if
-			SimpleTools.variableTrackingOutput("Booster.train(), the " + i + "th classifier has weight "
-					+ classifierWeights[i] + "\r\n");
+			//SimpleTools.variableTrackingOutput("Booster.train()");
 
 			SimpleTools.variableTrackingOutput("Classifier #" + i + " , weighted error = "
 					+ tempError + ", weight = " + classifierWeights[i] + "\r\n");
@@ -267,6 +270,8 @@ public class Booster extends Object{
 			int tempLabel = classifiers[i].classify(paraInstance);
 			tempLabelsCountArray[tempLabel] += classifierWeights[i];
 		} // Of for i
+		
+		SimpleTools.variableTrackingOutput(Arrays.toString(tempLabelsCountArray));
 
 		int resultLabel = -1;
 		double tempMax = -1;
@@ -377,14 +382,14 @@ public class Booster extends Object{
 	 */
 	public static void main(String args[]) {
 		System.out.println("Starting AdaBoosting...");
+		SimpleTools.processTracking = false;
+		SimpleTools.variableTracking = true;
 		//Booster tempBooster = new Booster("src/data/wdbc_norm_ex.arff");
 		//Booster tempBooster = new Booster("src/data/iris.arff", 0.8);
-		Booster tempBooster = new Booster("src/data/smalliris.arff", 0.8);
+		Booster tempBooster = new Booster("src/data/smalliris.arff");
 		//Booster tempBooster = new Booster("src/data/wine.arff", 0.8);
 
 		tempBooster.setStopAfterConverge(true);
-		SimpleTools.processTracking = false;
-		SimpleTools.variableTracking = true;
 		tempBooster.setNumBaseClassifiers(20);
 		tempBooster.train();
 
