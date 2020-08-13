@@ -175,7 +175,7 @@ public class GaussianClassifier extends SimpleClassifier {
 	 ****************** 
 	 */
 	public String toString() {
-		String resultString = "I am a Bayes classifier.\r\n" + "I choose attribute #"
+		String resultString = "I am a Gaussian classifier.\r\n" + "I choose attribute #"
 				+ selectedAttribute + ".\r\n" + "My weighted error is: " + computeWeightedError()
 				+ ".\r\n" + "My accuracy is : " + computeTrainingAccuracy() + ".";
 

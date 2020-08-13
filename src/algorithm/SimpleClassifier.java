@@ -1,5 +1,6 @@
 package algorithm;
 
+import common.Common;
 import weka.core.Instance;
 
 /**
@@ -14,7 +15,7 @@ import weka.core.Instance;
  * @version 1.0
  */
 
-public abstract class SimpleClassifier {
+public abstract class SimpleClassifier extends Object{
 	
 	/**
 	 * The index of the current attribute.
@@ -90,6 +91,7 @@ public abstract class SimpleClassifier {
 	public boolean[] computeCorrectnessArray() {
 		boolean[] resultCorrectnessArray = new boolean[weightedInstances.numInstances()];
 		for (int i = 0; i < resultCorrectnessArray.length; i++) {
+			Common.runSteps ++;
 			Instance tempInstance = weightedInstances.instance(i);
 			if ((int) (tempInstance.classValue()) == classify(tempInstance)) {
 				resultCorrectnessArray[i] = true;
@@ -112,6 +114,7 @@ public abstract class SimpleClassifier {
 		double tempCorrect = 0;
 		boolean[] tempCorrectnessArray = computeCorrectnessArray();
 		for (int i = 0; i < tempCorrectnessArray.length; i++) {
+			Common.runSteps ++;
 			if (tempCorrectnessArray[i]) {
 				tempCorrect ++;
 			} // Of if
@@ -134,6 +137,7 @@ public abstract class SimpleClassifier {
 		double resultError = 0;
 		boolean[] tempCorrectnessArray = computeCorrectnessArray();
 		for (int i = 0; i < tempCorrectnessArray.length; i++) {
+			Common.runSteps ++;
 			if (!tempCorrectnessArray[i]) {
 				resultError += weightedInstances.getWeight(i);
 			} // Of if

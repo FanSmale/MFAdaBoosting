@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import weka.core.Instance;
 import weka.core.Instances;
-
+import common.Common;
 import common.SimpleTools;
 
 /**
@@ -246,6 +246,7 @@ public class Booster extends Object {
 
 		// Step 2. Build other classifiers.
 		for (int i = 0; i < classifiers.length; i++) {
+			Common.runSteps ++;
 			// Step 2.1 Construct or adjust the weightedInstances
 			if (i == 0) {
 				tempWeightedInstances = new WeightedInstances(trainingData);
@@ -315,6 +316,7 @@ public class Booster extends Object {
 	public int classify(Instance paraInstance) {
 		double[] tempLabelsCountArray = new double[trainingData.classAttribute().numValues()];
 		for (int i = 0; i < numClassifiers; i++) {
+			Common.runSteps ++;
 			int tempLabel = classifiers[i].classify(paraInstance);
 			tempLabelsCountArray[tempLabel] += classifierWeights[i];
 		} // Of for i
@@ -324,6 +326,7 @@ public class Booster extends Object {
 		int resultLabel = -1;
 		double tempMax = -1;
 		for (int i = 0; i < tempLabelsCountArray.length; i++) {
+			Common.runSteps ++;
 			if (tempMax < tempLabelsCountArray[i]) {
 				tempMax = tempLabelsCountArray[i];
 				resultLabel = i;
@@ -386,6 +389,7 @@ public class Booster extends Object {
 		paraInstances.setClassIndex(paraInstances.numAttributes() - 1);
 
 		for (int i = 0; i < paraInstances.numInstances(); i++) {
+			Common.runSteps ++;
 			Instance tempInstance = paraInstances.instance(i);
 			if (classify(tempInstance) == (int) tempInstance.classValue()) {
 				tempCorrect++;
@@ -409,6 +413,7 @@ public class Booster extends Object {
 		double tempCorrect = 0;
 
 		for (int i = 0; i < trainingData.numInstances(); i++) {
+			Common.runSteps ++;
 			if (classify(trainingData.instance(i)) == (int) trainingData.instance(i).classValue()) {
 				tempCorrect++;
 			} // Of if

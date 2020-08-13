@@ -63,6 +63,7 @@ public class StumpClassifier extends SimpleClassifier{
 			tempValuesArray[i] = weightedInstances.instance(i).value(selectedAttribute);
 		} // Of for i
 		Arrays.sort(tempValuesArray);
+		Common.runSteps += (long)(numInstances * Math.log(numInstances) / Math.log(2));
 
 		// Step 3. Initialize, classify all instances as the same with the
 		// original cut.
@@ -72,6 +73,7 @@ public class StumpClassifier extends SimpleClassifier{
 
 		// Step 3.1 Scan all labels to obtain their counts.
 		for (int i = 0; i < numInstances; i++) {
+			Common.runSteps ++;
 			// The label of the ith instance
 			tempCurrentLabel = (int) weightedInstances.instance(i).classValue();
 			tempLabelCountArray[tempCurrentLabel] += weightedInstances.getWeight(i);
@@ -108,11 +110,13 @@ public class StumpClassifier extends SimpleClassifier{
 			// Initialize again since it is used many times.
 			for (int j = 0; j < 2; j++) {
 				for (int k = 0; k < tempNumLabels; k++) {
+					Common.runSteps ++;
 					tempLabelCountMatrix[j][k] = 0;
 				} // Of for k
 			} // Of for j
 
 			for (int j = 0; j < numInstances; j++) {
+				Common.runSteps ++;
 				// The label of the jth instance
 				tempCurrentLabel = (int) weightedInstances.instance(j).classValue();
 				if (weightedInstances.instance(j).value(selectedAttribute) < tempCut) {
@@ -126,6 +130,7 @@ public class StumpClassifier extends SimpleClassifier{
 			double tempLeftMaxCorrect = 0;
 			int tempLeftBestLabel = 0;
 			for (int j = 0; j < tempLabelCountMatrix[0].length; j++) {
+				Common.runSteps ++;
 				if (tempLeftMaxCorrect < tempLabelCountMatrix[0][j]) {
 					tempLeftMaxCorrect = tempLabelCountMatrix[0][j];
 					tempLeftBestLabel = j;
@@ -136,6 +141,7 @@ public class StumpClassifier extends SimpleClassifier{
 			double tempRightMaxCorrect = 0;
 			int tempRightBestLabel = 0;
 			for (int j = 0; j < tempLabelCountMatrix[1].length; j++) {
+				Common.runSteps ++;
 				if (tempRightMaxCorrect < tempLabelCountMatrix[1][j]) {
 					tempRightMaxCorrect = tempLabelCountMatrix[1][j];
 					tempRightBestLabel = j;
@@ -144,6 +150,7 @@ public class StumpClassifier extends SimpleClassifier{
 
 			// Step 4.5 Compare with the current best.
 			if (tempMaxCorrect < tempLeftMaxCorrect + tempRightMaxCorrect) {
+				Common.runSteps ++;
 				tempMaxCorrect = tempLeftMaxCorrect + tempRightMaxCorrect;
 				bestCut = tempCut;
 				leftLeafLabel = tempLeftBestLabel;

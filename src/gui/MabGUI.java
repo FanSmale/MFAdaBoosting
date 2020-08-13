@@ -227,6 +227,7 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 	 */
 	public void actionPerformed(ActionEvent ae) {
 		Common.startTime = new Date().getTime();
+		Common.runSteps = 0;
 		messageTextArea.setText("Processing ... Please wait.\r\n");
 
 		// Parameters to be transferred to respective objects.
@@ -296,6 +297,7 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 		Common.endTime = new Date().getTime();
 		long tempTimeUsed = Common.endTime - Common.startTime;
 		messageTextArea.append("Runtime: " + tempTimeUsed + "\r\n");
+		messageTextArea.append("Run steps: " + Common.runSteps + "\r\n");
 
 		messageTextArea.append("\r\nEnd.");
 	} // Of actionPerformed
