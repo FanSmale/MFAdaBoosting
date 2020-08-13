@@ -157,6 +157,7 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 		String[] tempClassifierTypes = { "Stump", "Bayes", "Gaussian" };
 		baseClassifierTypeComboBox = new JComboBox<String>(tempClassifierTypes);
 		stopAfterConvergeCheckbox = new Checkbox("Stop after converge");
+		stopAfterConvergeCheckbox.addItemListener(this);
 		Panel settingPanel = new Panel();
 		settingPanel.add(new Label("Number of base classifiers:"));
 		settingPanel.add(numBaseClassifiersField);
@@ -308,6 +309,11 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 	 *************************** 
 	 */
 	public void itemStateChanged(ItemEvent paraEvent) {
+		if (paraEvent.getStateChange() == 1) {
+			numBaseClassifiersField.setText("101");
+		} else {
+			numBaseClassifiersField.setText("203");
+		}//Of if
 	} // Of itemStateChanged
 
 	/**
@@ -335,6 +341,7 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 			numBaseClassifiersField.setText(settings.getProperty("classifiers"));
 			String tempString = settings.getProperty("stopafterconverge");
 			stopAfterConvergeCheckbox.setState(Boolean.parseBoolean(tempString));
+			trainingFractionField.setText(settings.getProperty("trainingfraction"));
 		} catch (Exception ee) {
 			System.out.println("Error occurred while reading properties: " + ee);
 		} // Of try

@@ -6,7 +6,7 @@
    Chengdu 610500, China. www.fansmale.com.
  Progress:         Version 1.0.
  Written time:     July 20, 2020.
- Last modify time: July 20, 2020.
+ Last modify time: August 13, 2020.
 
 This is the help document of our training "AdaBoosting with Java implementation".
 
