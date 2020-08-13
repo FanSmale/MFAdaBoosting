@@ -20,8 +20,8 @@ import common.SimpleTools;
  * @version 1.0
  */
 
-public class Booster extends Object{
-	
+public class Booster extends Object {
+
 	/**
 	 * The training testing scheme: split in two.
 	 */
@@ -51,6 +51,11 @@ public class Booster extends Object{
 	 * Base classifier: Bayes classifier.
 	 */
 	public static final int BAYES_CLASSIFIER = 1;
+
+	/**
+	 * Base classifier: Gaussian classifier.
+	 */
+	public static final int Gaussian_CLASSIFIER = 2;
 
 	/**
 	 * The training testing scheme.
@@ -89,8 +94,7 @@ public class Booster extends Object{
 
 	/**
 	 ****************** 
-	 * The first constructor. 
-	 * The testing set is the same as the training set.
+	 * The first constructor. The testing set is the same as the training set.
 	 * 
 	 * @param paraTrainingFilename
 	 *            The data filename.
@@ -113,7 +117,7 @@ public class Booster extends Object{
 		// Step 5. The testing data is the same as the training data.
 		testingData = trainingData;
 		trainingTestingScheme = USE_TRAINING_SET;
-		
+
 		SimpleTools.variableTrackingOutput("****************Data**********\r\n" + trainingData);
 	}// Of the first constructor
 
@@ -212,8 +216,8 @@ public class Booster extends Object{
 	 */
 	public void setBaseClassifierType(int paraType) {
 		baseClassifierType = paraType;
-	} //Of setBaseClassifierType
-	
+	} // Of setBaseClassifierType
+
 	/**
 	 ****************** 
 	 * Setter.
@@ -229,6 +233,7 @@ public class Booster extends Object{
 	/**
 	 ****************** 
 	 * Train the booster.
+	 * 
 	 * @see algorithm.StumpClassifier#train()
 	 ****************** 
 	 */
@@ -238,10 +243,10 @@ public class Booster extends Object{
 		double tempError;
 		numClassifiers = 0;
 		SimpleTools.processTrackingOutput("Booster.train() Step 1\r\n");
-		
+
 		// Step 2. Build other classifiers.
 		for (int i = 0; i < classifiers.length; i++) {
-			//Step 2.1 Construct or adjust the weightedInstances
+			// Step 2.1 Construct or adjust the weightedInstances
 			if (i == 0) {
 				tempWeightedInstances = new WeightedInstances(trainingData);
 			} else {
@@ -252,17 +257,21 @@ public class Booster extends Object{
 			SimpleTools.processTrackingOutput("Booster.train() Step 2.1\r\n");
 
 			// Step 2.2 Train the next classifier.
-			switch (baseClassifierType){
+			switch (baseClassifierType) {
 			case STUMP_CLASSIFIER:
 				classifiers[i] = new StumpClassifier(tempWeightedInstances);
 				break;
 			case BAYES_CLASSIFIER:
 				classifiers[i] = new BayesClassifier(tempWeightedInstances);
 				break;
-				default:
-					System.out.println("Internal error. Unsupported base classifier type: " + baseClassifierType);
-					System.exit(0);
-			}//Of switch
+			case Gaussian_CLASSIFIER:
+				classifiers[i] = new GaussianClassifier(tempWeightedInstances);
+				break;
+			default:
+				System.out.println(
+						"Internal error. Unsupported base classifier type: " + baseClassifierType);
+				System.exit(0);
+			}// Of switch
 			classifiers[i].train();
 			SimpleTools.processTrackingOutput("Booster.train() Step 2.2\r\n");
 
@@ -272,8 +281,8 @@ public class Booster extends Object{
 			classifierWeights[i] = 0.5 * Math.log(1 / tempError - 1);
 			if (classifierWeights[i] < 1e-6) {
 				classifierWeights[i] = 0;
-			}//Of if
-			//SimpleTools.variableTrackingOutput("Booster.train()");
+			} // Of if
+				// SimpleTools.variableTrackingOutput("Booster.train()");
 
 			SimpleTools.variableTrackingOutput("Classifier #" + i + " , weighted error = "
 					+ tempError + ", weight = " + classifierWeights[i] + "\r\n");
@@ -309,7 +318,7 @@ public class Booster extends Object{
 			int tempLabel = classifiers[i].classify(paraInstance);
 			tempLabelsCountArray[tempLabel] += classifierWeights[i];
 		} // Of for i
-		
+
 		SimpleTools.variableTrackingOutput(Arrays.toString(tempLabelsCountArray));
 
 		int resultLabel = -1;
@@ -391,8 +400,7 @@ public class Booster extends Object{
 
 	/**
 	 ****************** 
-	 * Compute the training accuracy of the booster.
-	 * It is not weighted.
+	 * Compute the training accuracy of the booster. It is not weighted.
 	 * 
 	 * @return The training accuracy.
 	 ****************** 
@@ -423,10 +431,10 @@ public class Booster extends Object{
 		System.out.println("Starting AdaBoosting...");
 		SimpleTools.processTracking = false;
 		SimpleTools.variableTracking = true;
-		//Booster tempBooster = new Booster("src/data/wdbc_norm_ex.arff");
-		//Booster tempBooster = new Booster("src/data/iris.arff", 0.8);
+		// Booster tempBooster = new Booster("src/data/wdbc_norm_ex.arff");
+		// Booster tempBooster = new Booster("src/data/iris.arff", 0.8);
 		Booster tempBooster = new Booster("src/data/smalliris.arff");
-		//Booster tempBooster = new Booster("src/data/wine.arff", 0.8);
+		// Booster tempBooster = new Booster("src/data/wine.arff", 0.8);
 
 		tempBooster.setStopAfterConverge(true);
 		tempBooster.setNumBaseClassifiers(20);

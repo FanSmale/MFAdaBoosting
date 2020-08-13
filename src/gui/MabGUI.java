@@ -154,7 +154,7 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 
 		// Step 2. Settings.
 		numBaseClassifiersField = new IntegerField("100");
-		String[] tempClassifierTypes = { "Stump", "Bayes" };
+		String[] tempClassifierTypes = { "Stump", "Bayes", "Gaussian" };
 		baseClassifierTypeComboBox = new JComboBox<String>(tempClassifierTypes);
 		stopAfterConvergeCheckbox = new Checkbox("Stop after converge");
 		Panel settingPanel = new Panel();
