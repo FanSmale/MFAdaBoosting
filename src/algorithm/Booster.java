@@ -43,9 +43,24 @@ public class Booster extends Object{
 	int trainingTestingScheme;
 
 	/**
+	 * Base classifier: stump classifier.
+	 */
+	public static final int STUMP_CLASSIFIER = 0;
+
+	/**
+	 * Base classifier: Bayes classifier.
+	 */
+	public static final int BAYES_CLASSIFIER = 1;
+
+	/**
+	 * The training testing scheme.
+	 */
+	int baseClassifierType;
+
+	/**
 	 * Classifiers.
 	 */
-	StumpClassifier[] classifiers;
+	SimpleClassifier[] classifiers;
 
 	/**
 	 * Number of classifiers.
@@ -74,7 +89,8 @@ public class Booster extends Object{
 
 	/**
 	 ****************** 
-	 * The first constructor.
+	 * The first constructor. 
+	 * The testing set is the same as the training set.
 	 * 
 	 * @param paraTrainingFilename
 	 *            The data filename.
@@ -180,12 +196,24 @@ public class Booster extends Object{
 		numClassifiers = paraNumBaseClassifiers;
 
 		// Step 1. Allocate space (only reference) for classifiers
-		classifiers = new StumpClassifier[numClassifiers];
+		classifiers = new SimpleClassifier[numClassifiers];
 
 		// Step 2. Initialize classifier weights.
 		classifierWeights = new double[numClassifiers];
 	}// Of setNumBaseClassifiers
 
+	/**
+	 ****************** 
+	 * Set the base classifier type.
+	 * 
+	 * @param paraType
+	 *            The base classifier type.
+	 ****************** 
+	 */
+	public void setBaseClassifierType(int paraType) {
+		baseClassifierType = paraType;
+	} //Of setBaseClassifierType
+	
 	/**
 	 ****************** 
 	 * Setter.
@@ -209,7 +237,6 @@ public class Booster extends Object{
 		WeightedInstances tempWeightedInstances = null;
 		double tempError;
 		numClassifiers = 0;
-		System.out.println("****************** Booster.train() ******************\r\n");
 		SimpleTools.processTrackingOutput("Booster.train() Step 1\r\n");
 		
 		// Step 2. Build other classifiers.
@@ -225,7 +252,17 @@ public class Booster extends Object{
 			SimpleTools.processTrackingOutput("Booster.train() Step 2.1\r\n");
 
 			// Step 2.2 Train the next classifier.
-			classifiers[i] = new StumpClassifier(tempWeightedInstances);
+			switch (baseClassifierType){
+			case STUMP_CLASSIFIER:
+				classifiers[i] = new StumpClassifier(tempWeightedInstances);
+				break;
+			case BAYES_CLASSIFIER:
+				classifiers[i] = new BayesClassifier(tempWeightedInstances);
+				break;
+				default:
+					System.out.println("Internal error. Unsupported base classifier type: " + baseClassifierType);
+					System.exit(0);
+			}//Of switch
 			classifiers[i].train();
 			SimpleTools.processTrackingOutput("Booster.train() Step 2.2\r\n");
 

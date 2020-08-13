@@ -26,6 +26,7 @@ import gui.others.*;
  */
 
 public class MabGUI implements ActionListener, ItemListener, TextListener {
+	
 	/**
 	 * The properties for setting.
 	 */
@@ -57,6 +58,11 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 	private IntegerField numBaseClassifiersField;
 
 	/**
+	 * Base classifier type.
+	 */
+	private JComboBox<String> baseClassifierTypeComboBox;
+
+	/**
 	 * Stop when the error reaches 0.
 	 */
 	private Checkbox stopAfterConvergeCheckbox;
@@ -64,12 +70,12 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 	/**
 	 * Checkbox for variable tracking.
 	 */
-	private Checkbox variableTrackingCheckbox;
+	private Checkbox processTrackingCheckbox;
 
 	/**
 	 * Checkbox for variable tracking.
 	 */
-	private Checkbox processTrackingCheckbox;
+	private Checkbox variableTrackingCheckbox;
 
 	/**
 	 * Result output to file checkbox.
@@ -148,10 +154,15 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 
 		// Step 2. Settings.
 		numBaseClassifiersField = new IntegerField("100");
+		String[] tempClassifierTypes = { "Stump", "Bayes" };
+		baseClassifierTypeComboBox = new JComboBox<String>(tempClassifierTypes);
 		stopAfterConvergeCheckbox = new Checkbox("Stop after converge");
 		Panel settingPanel = new Panel();
 		settingPanel.add(new Label("Number of base classifiers:"));
 		settingPanel.add(numBaseClassifiersField);
+		settingPanel.add(numBaseClassifiersField);
+		settingPanel.add(new Label("Base classifier type:"));
+		settingPanel.add(baseClassifierTypeComboBox);
 		settingPanel.add(stopAfterConvergeCheckbox);
 
 		processTrackingCheckbox = new Checkbox(" Process tracking ", false);
@@ -223,6 +234,7 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 		String tempTestingFilename = testingFilenameField.getText().trim();
 
 		int tempNumBaseClassifiers = numBaseClassifiersField.getValue();
+		int tempBaseClassifierType = baseClassifierTypeComboBox.getSelectedIndex();
 		boolean tempStopAfterConverge = stopAfterConvergeCheckbox.getState();
 		double tempTrainingFraction = trainingFractionField.getValue();
 
@@ -246,19 +258,21 @@ public class MabGUI implements ActionListener, ItemListener, TextListener {
 			Booster tempBooster = null;
 			int tempScheme = trainingTestingSchemeComboBox.getSelectedIndex();
 			switch (tempScheme) {
-			case 0:
+			case Booster.SPLIT_IN_TWO:
 				tempBooster = new Booster(tempTrainingFilename, tempTrainingFraction);
 				break;
-			case 1:
+			case Booster.USE_TRAINING_SET:
 				tempBooster = new Booster(tempTrainingFilename);
 				break;
-			case 2:
+			case Booster.SPECIFY_TESTING_SET:
 				tempBooster = new Booster(tempTrainingFilename, tempTestingFilename);
 				break;
 			default:
 				System.out.println("Unsupported training-testing scheme: " + tempScheme);
+				System.exit(0);
 			}// Of switch
 			tempBooster.setNumBaseClassifiers(tempNumBaseClassifiers);
+			tempBooster.setBaseClassifierType(tempBaseClassifierType);
 			tempBooster.setStopAfterConverge(tempStopAfterConverge);
 
 			tempBooster.train();

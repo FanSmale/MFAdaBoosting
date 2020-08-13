@@ -19,17 +19,7 @@ import common.SimpleTools;
  * @version 1.0
  */
 
-public class StumpClassifier {
-
-	/**
-	 * Weighted data.
-	 */
-	WeightedInstances weightedInstances;
-
-	/**
-	 * The index of the current attribute.
-	 */
-	int selectedAttribute;
+public class StumpClassifier extends SimpleClassifier{
 
 	/**
 	 * The best cut for the current attribute on weightedInstances.
@@ -47,21 +37,16 @@ public class StumpClassifier {
 	int rightLeafLabel;
 
 	/**
-	 * The accuracy on the training set.
-	 */
-	double trainingAccuracy;
-
-	/**
 	 ****************** 
-	 * The first constructor.
+	 * The only constructor.
 	 * 
 	 * @param paraWeightedInstances
 	 *            The given instances.
 	 ****************** 
 	 */
 	public StumpClassifier(WeightedInstances paraWeightedInstances) {
-		weightedInstances = paraWeightedInstances;
-	}// Of the first constructor
+		super(paraWeightedInstances);
+	}// Of the only constructor
 
 	/**
 	 ****************** 
@@ -70,10 +55,10 @@ public class StumpClassifier {
 	 */
 	public void train() {
 		// Step 1. Randomly choose an attribute.
-		selectedAttribute = Common.random.nextInt(weightedInstances.numAttributes() - 1);
+		selectedAttribute = Common.random.nextInt(numConditions);
 
 		// Step 2. Find all attribute values and sort.
-		double[] tempValuesArray = new double[weightedInstances.numInstances()];
+		double[] tempValuesArray = new double[numInstances];
 		for (int i = 0; i < tempValuesArray.length; i++) {
 			tempValuesArray[i] = weightedInstances.instance(i).value(selectedAttribute);
 		} // Of for i
@@ -81,12 +66,12 @@ public class StumpClassifier {
 
 		// Step 3. Initialize, classify all instances as the same with the
 		// original cut.
-		int tempNumLabels = weightedInstances.classAttribute().numValues();
+		int tempNumLabels = numClasses;
 		double[] tempLabelCountArray = new double[tempNumLabels];
 		int tempCurrentLabel;
 
 		// Step 3.1 Scan all labels to obtain their counts.
-		for (int i = 0; i < weightedInstances.numInstances(); i++) {
+		for (int i = 0; i < numInstances; i++) {
 			// The label of the ith instance
 			tempCurrentLabel = (int) weightedInstances.instance(i).classValue();
 			tempLabelCountArray[tempCurrentLabel] += weightedInstances.getWeight(i);
@@ -127,7 +112,7 @@ public class StumpClassifier {
 				} // Of for k
 			} // Of for j
 
-			for (int j = 0; j < weightedInstances.numInstances(); j++) {
+			for (int j = 0; j < numInstances; j++) {
 				// The label of the jth instance
 				tempCurrentLabel = (int) weightedInstances.instance(j).classValue();
 				if (weightedInstances.instance(j).value(selectedAttribute) < tempCut) {
@@ -188,69 +173,6 @@ public class StumpClassifier {
 		} // Of if
 		return resultLabel;
 	}// Of classify
-
-	/**
-	 ****************** 
-	 * Which instances in the training set are correctly classified.
-	 * 
-	 * @return The correctness array.
-	 ****************** 
-	 */
-	public boolean[] computeCorrectnessArray() {
-		boolean[] resultCorrectnessArray = new boolean[weightedInstances.numInstances()];
-		for (int i = 0; i < resultCorrectnessArray.length; i++) {
-			Instance tempInstance = weightedInstances.instance(i);
-			if ((int) (tempInstance.classValue()) == classify(tempInstance)) {
-				resultCorrectnessArray[i] = true;
-			} // Of if
-		} // Of for i
-		return resultCorrectnessArray;
-	}// Of computeCorrectnessArray
-
-	/**
-	 ****************** 
-	 * Compute the accuracy on the training set.
-	 * 
-	 * @return The training accuracy.
-	 ****************** 
-	 */
-	public double computeTrainingAccuracy() {
-		double tempCorrect = 0;
-		boolean[] tempCorrectnessArray = computeCorrectnessArray();
-		for (int i = 0; i < tempCorrectnessArray.length; i++) {
-			if (tempCorrectnessArray[i]) {
-				tempCorrect++;
-			} // Of if
-		} // Of for i
-
-		double resultAccuracy = tempCorrect / tempCorrectnessArray.length;
-
-		return resultAccuracy;
-	}// Of computeTrainingAccuracy
-
-	/**
-	 ****************** 
-	 * Compute the weighted error on the training set. It is at least 1e-6 to
-	 * avoid NaN.
-	 * 
-	 * @return The weighted error.
-	 ****************** 
-	 */
-	public double computeWeightedError() {
-		double resultError = 0;
-		boolean[] tempCorrectnessArray = computeCorrectnessArray();
-		for (int i = 0; i < tempCorrectnessArray.length; i++) {
-			if (!tempCorrectnessArray[i]) {
-				resultError += weightedInstances.getWeight(i);
-			} // Of if
-		} // Of for i
-
-		if (resultError < 1e-6) {
-			resultError = 1e-6;
-		} // Of if
-
-		return resultError;
-	}// Of computeWeightedError
 
 	/**
 	 ****************** 
