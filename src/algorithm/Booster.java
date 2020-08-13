@@ -290,11 +290,11 @@ public class Booster extends Object {
 
 			numClassifiers++;
 
-			double tempTrainingAccuracy = computeTrainingAccuray();
-			SimpleTools.variableTrackingOutput(
-					"The accuracy of the booster is: " + tempTrainingAccuracy + "\r\n");
 			// The accuracy is enough.
 			if (stopAfterConverge) {
+				double tempTrainingAccuracy = computeTrainingAccuray();
+				SimpleTools.variableTrackingOutput(
+						"The accuracy of the booster is: " + tempTrainingAccuracy + "\r\n");
 				if (tempTrainingAccuracy > 0.999999) {
 					SimpleTools.processTrackingOutput(
 							"Stop at the round: " + i + " due to converge.\r\n");

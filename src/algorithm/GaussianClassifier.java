@@ -83,7 +83,7 @@ public class GaussianClassifier extends SimpleClassifier {
 			double tempMu = gaussianParameters[i].mu;
 
 			double tempPseudoProbability = Math.log(classDistributionLaplacian[i]) 
-					- Math.log(tempSigma)
+					- Math.log(tempSigma) 
 					- (tempAttributeValue - tempMu) * (tempAttributeValue - tempMu)
 							/ (2 * tempSigma * tempSigma);
 
@@ -161,7 +161,7 @@ public class GaussianClassifier extends SimpleClassifier {
 		
 		//Step 3. Calculate
 		for (int i = 0; i < numClasses; i++) {
-			tempSigmaArray[i] = Math.sqrt(tempSigmaSumArray[i] / tempWeightSumArray[i]);
+			tempSigmaArray[i] = Math.sqrt(tempSigmaSumArray[i] / tempWeightSumArray[i] / numInstances);
 			gaussianParameters[i] = new GaussianParamters(tempMuArray[i], tempSigmaArray[i]);
 		}//Of for i
 		
@@ -220,7 +220,7 @@ public class GaussianClassifier extends SimpleClassifier {
 
 		public GaussianParamters(double paraMu, double paraSigma) {
 			mu = paraMu;
-			sigma = paraSigma / 10;
+			sigma = paraSigma;
 			//sigma = 0.1;
 		}// Of the constructor
 
